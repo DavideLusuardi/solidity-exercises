@@ -7,5 +7,10 @@ contract SumArray {
         // arr is a list of unsigned integers
         // return the sum of them. If the array
         // is empty, return 0
+        uint256 t = 0;
+        for (uint256 i = 0; i < arr.length; i++) {
+            t += arr[i];
+        }
+        return t;
     }
 }

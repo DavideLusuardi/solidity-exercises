@@ -2,7 +2,14 @@
 pragma solidity ^0.8.13;
 
 contract TimelockEscrow {
+
+    struct Order {
+        uint256 timestamp;
+        uint256 amount;
+    }
+
     address public seller;
+    mapping(address => Order) orders;
 
     /**
      * The goal of this exercise is to create a Time lock escrow.
@@ -20,25 +27,34 @@ contract TimelockEscrow {
      * should revert if an active escrow still exist or last escrow hasn't been withdrawn
      */
     function createBuyOrder() external payable {
-        // your code here
+        require(orders[msg.sender].timestamp == 0, "active escrow still exist");
+        orders[msg.sender] = Order({timestamp: block.timestamp, amount: msg.value});
     }
 
     /**
      * allows seller to withdraw after 3 days of the escrow with @param buyer has passed
      */
     function sellerWithdraw(address buyer) external {
-        // your code here
+        require(block.timestamp >= orders[buyer].timestamp + 3 days, "wait");
+        (bool ok, ) = msg.sender.call{value: orders[buyer].amount}("");
+        require(ok, "transfer failed");
+        orders[buyer].amount = 0;
+        orders[buyer].timestamp = 0;
     }
 
     /**
-     * allowa buyer to withdraw at anytime before the end of the escrow (3 days)
+     * allows buyer to withdraw at anytime before the end of the escrow (3 days)
      */
     function buyerWithdraw() external {
-        // your code here
+        require(block.timestamp < orders[msg.sender].timestamp + 3 days, "wait");
+        (bool ok, ) = msg.sender.call{value: orders[msg.sender].amount}("");
+        require(ok, "transfer failed");
+        orders[msg.sender].amount = 0;
+        orders[msg.sender].timestamp = 0;
     }
 
     // returns the escrowed amount of @param buyer
     function buyerDeposit(address buyer) external view returns (uint256) {
-        // your code here
+        return orders[buyer].amount;
     }
 }

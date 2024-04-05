@@ -13,15 +13,24 @@ contract OneWeekLockup {
      * - balanceOf(address )
      */
 
+    mapping(address => uint256) private balance;
+    mapping(address => uint256) lastcall;
+
     function balanceOf(address user) public view returns (uint256) {
         // return the user's balance in the contract
+        return balance[user];
     }
 
     function depositEther() external payable {
-        /// add code here
+        balance[msg.sender] += msg.value;
+        lastcall[msg.sender] = block.timestamp;
     }
 
     function withdrawEther(uint256 amount) external {
-        /// add code here
+        require(block.timestamp >= lastcall[msg.sender] + 1 weeks, "wait");
+        require(balance[msg.sender] >= amount, "amount exceeds balance");
+        (bool ok, ) = msg.sender.call{value: amount}("");
+        require(ok, "transaction failed");
+        balance[msg.sender] -= amount;
     }
 }

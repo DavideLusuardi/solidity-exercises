@@ -12,6 +12,13 @@ contract Fibonacci {
     */
 
     function fibonacci(uint256 _position) public view returns (uint256) {
-        // your code here
+        uint256 n1 = 0;
+        uint256 n2 = 1;
+        for (uint256 i = 0; i < _position; i++) {
+            uint256 tmp = n1+n2;
+            n1 = n2;
+            n2 = tmp;
+        }
+        return n1;
     }
 }

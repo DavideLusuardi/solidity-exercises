@@ -12,6 +12,7 @@ contract Exponent {
         view
         returns (uint256)
     {
-        // your code here
+        uint256 res = _base ** _e;
+        return res;
     }
 }

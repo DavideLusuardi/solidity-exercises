@@ -18,6 +18,15 @@ contract ReducingPayout {
     }
 
     function withdraw() public {
-        // your code here
+        if (block.timestamp >= depositedTime + 24 hours) {
+            return;
+        }
+
+        uint256 remainingTime = depositedTime + 24 hours - block.timestamp;
+        // uint256 amount = address(this).balance*remainingTime/(24 hours);
+        // uint256 amount = remainingTime*(0.0011574 ether)/100;
+        uint256 amount = address(this).balance - (block.timestamp - depositedTime)*(0.0011574 ether)/100;
+        (bool ok, ) = msg.sender.call{value: amount}("");
+        require(ok, "transfer failed");
     }
 }
